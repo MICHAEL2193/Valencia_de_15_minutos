@@ -13,7 +13,18 @@ def score_color(score):
     else:
         return "#d73027"   # rojo
 
+def cluster_outline_color(cluster):
+    palette = {
+        0: "#1f77b4",  # azul
+        1: "#ff7f0e",  # naranja
+        2: "#2ca02c",  # verde
+        3: "#9467bd",  # morado
+    }
+    return palette.get(int(cluster), "black")
+
 def main():
+    OUTPUT_MAPS.mkdir(parents=True, exist_ok=True)
+    
     print("1) Cargando datos...")
     zones = gpd.read_file(DATA_PROCESSED / "zones_clustered.geojson").to_crs("EPSG:4326")
     services = gpd.read_file(DATA_PROCESSED / "services.geojson").to_crs("EPSG:4326")
@@ -23,16 +34,18 @@ def main():
 
     print("3) Añadiendo zonas...")
     for _, row in zones.iterrows():
+        border_color = cluster_outline_color(row["cluster"])
         folium.GeoJson(
             row["geometry"],
-            style_function=lambda feature, score=row["score_15min"]: {
+            style_function=lambda feature, score=row["score_15min"], color=border_color: {
                 "fillColor": score_color(score),
-                "color": "black",
-                "weight": 0.5,
+                "color": color,
+                "weight": 1.0,
                 "fillOpacity": 0.5,
             },
             tooltip=folium.Tooltip(
                 f"Zona: {row['zone_id']}<br>"
+                f"Nombre: {row.get('zone_name', 'Sin nombre')}<br>"
                 f"Score: {row['score_15min']:.1f}<br>"
                 f"Servicios cercanos: {int(row['services_count'])}<br>"
                 f"Cluster: {int(row['cluster'])}"

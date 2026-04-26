@@ -19,42 +19,82 @@ st.write(
     """
 )
 
-zones = pd.read_csv(DATA_PROCESSED / "zones_clustered.csv")
-services = pd.read_csv(DATA_PROCESSED / "services.csv")
+zones_path = DATA_PROCESSED / "zones_clustered.csv"
+services_path = DATA_PROCESSED / "services.csv"
+map_path = OUTPUT_MAPS / "valencia_15min_map.html"
 
-col1, col2, col3 = st.columns(3)
-col1.metric("Número de zonas", len(zones))
-col2.metric("Número de servicios", len(services))
-col3.metric("Score medio", f"{zones['score_15min'].mean():.1f}")
+if not zones_path.exists() or not services_path.exists():
+    st.error(
+        "No se encontraron los datos procesados. Ejecuta primero los scripts del pipeline."
+    )
+    st.stop()
 
-st.subheader("📊 Resumen")
-st.write("Top 10 zonas con mejor accesibilidad")
-st.dataframe(zones.sort_values("score_15min", ascending=False).head(10))
+zones = pd.read_csv(zones_path)
+services = pd.read_csv(services_path)
 
-st.write("10 zonas con peor accesibilidad")
-st.dataframe(zones.sort_values("score_15min", ascending=True).head(10))
+tab_resumen, tab_graficos, tab_mapa = st.tabs(["📊 Resumen", "🖼️ Gráficos", "🗺️ Mapa"])
 
-st.subheader("🧩 Distribución por cluster")
-cluster_counts = zones["cluster"].value_counts().sort_index()
-st.bar_chart(cluster_counts)
+with tab_resumen:
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Número de zonas", len(zones))
+    col2.metric("Número de servicios", len(services))
 
-st.subheader("🖼️ Gráficos")
-st.image(str(OUTPUT_PLOTS / "01_service_counts.png"))
-st.image(str(OUTPUT_PLOTS / "02_score_histogram.png"))
-st.image(str(OUTPUT_PLOTS / "03_top10_zones.png"))
-st.image(str(OUTPUT_PLOTS / "04_bottom10_zones.png"))
-st.image(str(OUTPUT_PLOTS / "05_cluster_counts.png"))
+    score_medio = zones["score_15min"].mean() if "score_15min" in zones.columns else 0
+    col3.metric("Score medio", f"{score_medio:.1f}")
 
-st.subheader("🗺️ Mapa interactivo")
-html_map = (OUTPUT_MAPS / "valencia_15min_map.html").read_text(encoding="utf-8")
-components.html(html_map, height=700, scrolling=True)
+    display_cols = ["zone_id", "zone_name", "score_15min", "services_count", "cluster"]
+    display_cols = [col for col in display_cols if col in zones.columns]
+
+    if "score_15min" in zones.columns and display_cols:
+        st.write("Top 10 barrios/distritos con mejor accesibilidad")
+        st.dataframe(
+            zones.sort_values("score_15min", ascending=False)[display_cols].head(10),
+            use_container_width=True,
+        )
+
+        st.write("10 barrios/distritos con peor accesibilidad")
+        st.dataframe(
+            zones.sort_values("score_15min", ascending=True)[display_cols].head(10),
+            use_container_width=True,
+        )
+    else:
+        st.warning("No hay columnas suficientes para mostrar el ranking de accesibilidad.")
+
+    st.subheader("🧩 Distribución por cluster")
+    if "cluster" in zones.columns:
+        cluster_counts = zones["cluster"].value_counts().sort_index()
+        st.bar_chart(cluster_counts)
+    else:
+        st.warning("No se encontró la columna 'cluster' en zonas.")
+
+with tab_graficos:
+    plot_files = [
+        "01_service_counts.png",
+        "02_score_histogram.png",
+        "03_top10_zones.png",
+        "04_bottom10_zones.png",
+        "05_cluster_counts.png",
+    ]
+    for plot_name in plot_files:
+        plot_path = OUTPUT_PLOTS / plot_name
+        if plot_path.exists():
+            st.image(str(plot_path))
+        else:
+            st.info(f"No existe aún: {plot_name}")
+
+with tab_mapa:
+    if map_path.exists():
+        html_map = map_path.read_text(encoding="utf-8")
+        components.html(html_map, height=700, scrolling=True)
+    else:
+        st.warning("No existe el mapa interactivo. Ejecuta `src/step6_build_map.py`.")
 
 st.subheader("📝 Conclusiones orientativas")
 st.markdown(
     """
 - Las zonas con mayor score tienen más servicios básicos a distancia caminable.
 - Las zonas con menor score presentan menor cobertura de servicios.
-- El clustering permite agrupar áreas urbanas con patrones de accesibilidad similares.
+- El clustering agrupa áreas urbanas con patrones de accesibilidad similares.
 - El modelo usa una aproximación de 1.200 metros como equivalente a 15 minutos caminando.
 """
 )

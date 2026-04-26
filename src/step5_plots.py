@@ -32,9 +32,12 @@ def main():
     plt.close()
 
     print("4) Top 10 zonas...")
+    label_col = "zone_name" if "zone_name" in zones.columns else "zone_id"
+
     top10 = zones.sort_values("score_15min", ascending=False).head(10)
     plt.figure(figsize=(10, 6))
-    plt.barh(top10["zone_id"], top10["score_15min"])
+    plt.barh(top10[label_col], top10["score_15min"])
+
     plt.title("Top 10 zonas con mejor accesibilidad")
     plt.xlabel("Score 15 min")
     plt.gca().invert_yaxis()
@@ -45,7 +48,8 @@ def main():
     print("5) Peores 10 zonas...")
     bottom10 = zones.sort_values("score_15min", ascending=True).head(10)
     plt.figure(figsize=(10, 6))
-    plt.barh(bottom10["zone_id"], bottom10["score_15min"])
+    plt.barh(bottom10[label_col], bottom10["score_15min"])
+
     plt.title("10 zonas con peor accesibilidad")
     plt.xlabel("Score 15 min")
     plt.gca().invert_yaxis()

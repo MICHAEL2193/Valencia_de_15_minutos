@@ -49,3 +49,15 @@ OSM_TAGS = {
     "highway": ["bus_stop"],
     "railway": ["station", "tram_stop", "subway_entrance"],
 }
+
+# -----------------------------
+# Zonas oficiales de Valencia
+# -----------------------------
+
+# Opciones: "barrios" o "distritos"
+ZONE_LEVEL = "barrios"
+
+OFFICIAL_ZONES_URLS = {
+    "barrios": "https://geoportal.valencia.es/server/rest/services/OPENDATA/UrbanismoEInfraestructuras/MapServer/224/query?where=1=1&outFields=%2A&f=geojson",
+    "distritos": "https://geoportal.valencia.es/server/rest/services/OPENDATA/UrbanismoEInfraestructuras/MapServer/225/query?where=1=1&outFields=%2A&f=geojson",
+}
