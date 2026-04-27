@@ -61,3 +61,48 @@ OFFICIAL_ZONES_URLS = {
     "barrios": "https://geoportal.valencia.es/server/rest/services/OPENDATA/UrbanismoEInfraestructuras/MapServer/224/query?where=1=1&outFields=%2A&f=geojson",
     "distritos": "https://geoportal.valencia.es/server/rest/services/OPENDATA/UrbanismoEInfraestructuras/MapServer/225/query?where=1=1&outFields=%2A&f=geojson",
 }
+
+# -----------------------------
+# Mejora: rutas reales caminando
+# -----------------------------
+WALK_GRAPH_PATH = DATA_RAW / "valencia_walk.graphml"
+
+# Número de servicios candidatos por categoría.
+# Primero buscamos los más cercanos en línea recta y luego calculamos ruta real.
+K_NEAREST_CANDIDATES = 8
+
+# Distancia máxima para valorar proximidad.
+# 1200 m = accesible en 15 min aprox.
+# 2400 m = muy lejos para este análisis.
+MAX_PROFILE_DISTANCE_METERS = 2400
+
+
+# -----------------------------
+# Mejora: perfiles de usuario
+# -----------------------------
+PROFILE_WEIGHTS = {
+    "familia": {
+        "alimentacion": 1.0,
+        "farmacia": 1.0,
+        "salud": 1.2,
+        "educacion": 1.5,
+        "parque": 1.3,
+        "transporte": 1.0,
+    },
+    "estudiante": {
+        "alimentacion": 1.2,
+        "farmacia": 0.8,
+        "salud": 0.8,
+        "educacion": 1.5,
+        "parque": 0.8,
+        "transporte": 1.5,
+    },
+    "persona_mayor": {
+        "alimentacion": 1.3,
+        "farmacia": 1.6,
+        "salud": 1.6,
+        "educacion": 0.4,
+        "parque": 1.0,
+        "transporte": 1.4,
+    },
+}
