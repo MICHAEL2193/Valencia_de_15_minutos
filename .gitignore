@@ -1,61 +1,6 @@
-# =========================
-# Python / entorno virtual
-# =========================
 .venv/
-venv/
-env/
 __pycache__/
-*.py[cod]
-*$py.class
-
-# =========================
-# Jupyter Notebooks
-# =========================
-.ipynb_checkpoints/
-
-# =========================
-# Cachés de librerías
-# =========================
-.cache/
+*.pyc
 cache/
-.osmnx_cache/
-*.log
-
-# =========================
-# Streamlit
-# =========================
-.streamlit/secrets.toml
-
-# =========================
-# Archivos del sistema
-# =========================
+.ipynb_checkpoints/
 .DS_Store
-Thumbs.db
-
-# =========================
-# VS Code / Cursor
-# =========================
-.vscode/
-.cursor/
-
-# =========================
-# Datos generados automáticamente
-# =========================
-data/raw/
-data/processed/
-
-# =========================
-# Salidas generadas automáticamente
-# =========================
-outputs/maps/
-outputs/mapas/
-outputs/plots/
-outputs/graficos/
-outputs/tablas/
-
-# =========================
-# Archivos temporales
-# =========================
-*.tmp
-*.bak
-*.backup
